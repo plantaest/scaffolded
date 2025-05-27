@@ -1,0 +1,18 @@
+{
+  "ui": {
+    "languages": "Languages",
+    "themes": "Themes",
+    "hotkeys": "Hotkeys",
+    "about": "About",
+    "history": "History",
+    "templates": "Templates",
+    "reset": "Reset",
+    "generateTranslatorId": "Generate translatorID",
+    "beautify": "Beautify",
+    "save": "Save",
+    "typeUrl": "Type URL...",
+    "run": "Run",
+    "test": "Test",
+    "basic": "Basic"
+  }
+}

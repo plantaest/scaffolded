@@ -11,8 +11,8 @@ import {
   IconRestore,
   IconSlash,
   IconWand,
-  IconWorld,
 } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 import {
   ActionIcon,
   Button,
@@ -35,12 +35,14 @@ import {
 } from '@mantine/core';
 import { basicTranslator } from '@/app/basic-translator';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle/ColorSchemeToggle';
+import { LocaleSwitcher } from '@/components/LocaleSwitcher/LocaleSwitcher';
 import { Logo } from '@/components/Logo/Logo';
 import classes from './page.module.css';
 
-const defaultEditorValue = '// Write your own translator or choose a template...';
+const defaultEditorValue = '// (EN) Write your own translator or choose a template...';
 
 export default function HomePage() {
+  const t = useTranslations();
   const computedColorScheme = useComputedColorScheme('light');
   const [theme, setTheme] = useState<'light' | 'vs-dark'>(
     computedColorScheme === 'light' ? 'light' : 'vs-dark'
@@ -67,18 +69,14 @@ export default function HomePage() {
 
           <Group gap="xs">
             <TooltipGroup openDelay={500} closeDelay={100}>
-              <Tooltip label="Languages">
-                <ActionIcon variant="default">
-                  <IconWorld style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                </ActionIcon>
-              </Tooltip>
+              <LocaleSwitcher />
               <ColorSchemeToggle />
-              <Tooltip label="Hotkeys">
+              <Tooltip label={t('ui.hotkeys')}>
                 <ActionIcon variant="default">
                   <IconSlash style={{ width: '70%', height: '70%' }} stroke={1.5} />
                 </ActionIcon>
               </Tooltip>
-              <Tooltip label="About">
+              <Tooltip label={t('ui.about')}>
                 <ActionIcon variant="default">
                   <IconInfoCircle style={{ width: '70%', height: '70%' }} stroke={1.5} />
                 </ActionIcon>
@@ -93,7 +91,7 @@ export default function HomePage() {
           <Flex direction="column" h="100%">
             <Group justify="space-between" p="md">
               <Group gap="xs">
-                <Tooltip label="History" openDelay={500}>
+                <Tooltip label={t('ui.history')} openDelay={500}>
                   <ActionIcon variant="default">
                     <IconHistory style={{ width: '70%', height: '70%' }} stroke={1.5} />
                   </ActionIcon>
@@ -110,7 +108,7 @@ export default function HomePage() {
                 <TooltipGroup openDelay={500} closeDelay={100}>
                   <Menu shadow="md" width={200} position="bottom-end">
                     <MenuTarget>
-                      <Tooltip label="Templates">
+                      <Tooltip label={t('ui.templates')}>
                         <ActionIcon variant="default">
                           <IconBracketsAngle style={{ width: '70%', height: '70%' }} stroke={1.5} />
                         </ActionIcon>
@@ -121,7 +119,7 @@ export default function HomePage() {
                         leftSection={<IconCode size={14} />}
                         onClick={handleClickBasicTranslatorMenu}
                       >
-                        Basic Translator
+                        {t('ui.basic')}
                       </MenuItem>
                       <MenuDivider />
                       <MenuItem
@@ -129,16 +127,16 @@ export default function HomePage() {
                         leftSection={<IconRestore size={14} />}
                         onClick={handleClickResetMenu}
                       >
-                        Reset
+                        {t('ui.reset')}
                       </MenuItem>
                     </MenuDropdown>
                   </Menu>
-                  <Tooltip label="Generate translatorID">
+                  <Tooltip label={t('ui.generateTranslatorId')}>
                     <ActionIcon variant="default">
                       <Icon123 style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
                   </Tooltip>
-                  <Tooltip label="Beautify">
+                  <Tooltip label={t('ui.beautify')}>
                     <ActionIcon variant="default">
                       <IconWand style={{ width: '70%', height: '70%' }} stroke={1.5} />
                     </ActionIcon>
@@ -146,7 +144,7 @@ export default function HomePage() {
                 </TooltipGroup>
                 <Divider orientation="vertical" />
                 <Button size="compact-sm" color="green">
-                  Save
+                  {t('ui.save')}
                 </Button>
               </Group>
             </Group>
@@ -180,14 +178,14 @@ export default function HomePage() {
                 <TextInput
                   variant="filled"
                   size="xs"
-                  placeholder="Type URL..."
+                  placeholder={t('ui.typeUrl')}
                   w="100%"
                   flex={1}
                   styles={{ input: { height: 28, minHeight: 28 } }}
                 />
-                <Button size="compact-sm">Run</Button>
+                <Button size="compact-sm">{t('ui.run')}</Button>
                 <Divider orientation="vertical" />
-                <Button size="compact-sm">Test</Button>
+                <Button size="compact-sm">{t('ui.test')}</Button>
               </Group>
             </Group>
 

@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { IconDeviceDesktop, IconMoon, IconSun } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
 import { ActionIcon, Tooltip, useMantineColorScheme } from '@mantine/core';
 import { useMounted } from '@mantine/hooks';
 
 const colorSchemeValues = ['auto', 'light', 'dark'] as const;
 
 export function ColorSchemeToggle() {
+  const t = useTranslations();
   const mounted = useMounted();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const initialColorSchemeValueIndex = colorSchemeValues.findIndex(
@@ -30,7 +32,7 @@ export function ColorSchemeToggle() {
         : IconSun;
 
   return (
-    <Tooltip label="Themes">
+    <Tooltip label={t('ui.themes')}>
       <ActionIcon variant="default" onClick={handleToggleColorSchemeButton}>
         <Icon style={{ width: '70%', height: '70%' }} stroke={1.5} />
       </ActionIcon>

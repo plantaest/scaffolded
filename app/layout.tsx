@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 import { JetBrains_Mono } from 'next/font/google';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale } from 'next-intl/server';
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
 import { theme } from '@/theme';
 
@@ -15,9 +17,11 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const locale = await getLocale();
+
   return (
-    <html lang="en" className={jetbrainsMono.className} {...mantineHtmlProps}>
+    <html lang={locale} className={jetbrainsMono.className} {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.svg" />
@@ -27,7 +31,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <NextIntlClientProvider>
+          <MantineProvider theme={theme}>{children}</MantineProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

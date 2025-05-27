@@ -1,0 +1,18 @@
+{
+  "ui": {
+    "languages": "Ngôn ngữ",
+    "themes": "Chủ đề",
+    "hotkeys": "Phím tắt",
+    "about": "Về dự án",
+    "history": "Lịch sử",
+    "templates": "Mẫu",
+    "reset": "Đặt lại",
+    "generateTranslatorId": "Sinh translatorID",
+    "beautify": "Làm đẹp mã",
+    "save": "Lưu",
+    "typeUrl": "Nhập URL...",
+    "run": "Chạy",
+    "test": "Kiểm thử",
+    "basic": "Cơ bản"
+  }
+}
