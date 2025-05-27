@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { JetBrains_Mono } from 'next/font/google';
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
 import { theme } from '@/theme';
 
@@ -9,9 +10,14 @@ export const metadata = {
   description: 'Web-based IDE for Zotero translator development',
 };
 
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+});
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" {...mantineHtmlProps}>
+    <html lang="en" className={jetbrainsMono.className} {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.svg" />
