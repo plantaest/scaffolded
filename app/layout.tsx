@@ -3,6 +3,7 @@ import { JetBrains_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale } from 'next-intl/server';
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
 import { theme } from '@/theme';
 
 import '@mantine/core/styles.css';
@@ -32,7 +33,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body>
         <NextIntlClientProvider>
-          <MantineProvider theme={theme}>{children}</MantineProvider>
+          <MantineProvider theme={theme}>
+            <ModalsProvider>{children}</ModalsProvider>
+          </MantineProvider>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -1,3 +1,5 @@
+'use client';
+
 import { IconInfoCircle, IconSlash } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { ActionIcon, Card, Group, Tooltip, TooltipGroup } from '@mantine/core';

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Editor as MonacoEditor } from '@monaco-editor/react';
+import dayjs from 'dayjs';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { BeforeMount, Editor as MonacoEditor, OnChange, OnMount } from '@monaco-editor/react';
 import {
   Icon123,
   IconBracketsAngle,
@@ -9,7 +10,9 @@ import {
   IconHistory,
   IconRestore,
   IconWand,
+  IconX,
 } from '@tabler/icons-react';
+import { nanoid } from 'nanoid';
 import { useTranslations } from 'next-intl';
 import {
   ActionIcon,
@@ -23,56 +26,200 @@ import {
   MenuDivider,
   MenuDropdown,
   MenuItem,
+  MenuLabel,
   MenuTarget,
+  Stack,
   Text,
   Tooltip,
   TooltipGroup,
   useComputedColorScheme,
 } from '@mantine/core';
+import { useForceUpdate } from '@mantine/hooks';
+import { modals } from '@mantine/modals';
 import { basicTranslator } from '@/app/basic-translator';
-
-const defaultEditorValue = '// (EN) Write your own translator or choose a template...';
+import { Translator } from '@/types/Translator';
+import { appConfig } from '@/utils/appConfig';
+import {
+  getTranslatorById,
+  loadAllTranslators,
+  persistTranslator,
+  updateTranslatorContent,
+} from '@/utils/db';
 
 interface EditorProps {
-  translatorId: string;
+  generatedTranslatorId: string;
 }
 
-export function Editor({ translatorId }: EditorProps) {
+export function Editor({ generatedTranslatorId }: EditorProps) {
   const t = useTranslations();
   const computedColorScheme = useComputedColorScheme('light');
-  const [theme, setTheme] = useState<'light' | 'vs-dark'>(
-    computedColorScheme === 'light' ? 'light' : 'vs-dark'
-  );
-  const [code, setCode] = useState(defaultEditorValue);
+  const theme = computedColorScheme === 'light' ? 'light' : 'vs-dark';
+  const editorRef = useRef<Parameters<OnMount>[0]>(null);
+  const temporaryRef = useRef(true);
+  const translatorIdRef = useRef(generatedTranslatorId);
+  const [translators, setTranslators] = useState<Translator[]>([]);
+  const [triggerLoadAllTranslators, setTriggerLoadAllTranslators] = useState(0);
+  const forceUpdate = useForceUpdate();
 
   useEffect(() => {
-    setTheme(computedColorScheme === 'light' ? 'light' : 'vs-dark');
-  }, [computedColorScheme]);
+    loadAllTranslators().then(setTranslators);
+  }, [triggerLoadAllTranslators]);
+
+  const handleMouseEnterHistoryButton = () => {
+    setTriggerLoadAllTranslators((trigger) => trigger + 1);
+  };
+
+  const handleClickHistoryMenuItem = async (selectedTranslatorId: string) => {
+    if (selectedTranslatorId === translatorIdRef.current) {
+      return;
+    }
+
+    const translator = await getTranslatorById(selectedTranslatorId);
+
+    if (translator) {
+      temporaryRef.current = false;
+      translatorIdRef.current = translator.id;
+      editorRef.current?.setValue(translator.content);
+      forceUpdate();
+    }
+  };
+
+  const handleClickCloseTranslatorButton = () => {
+    temporaryRef.current = true;
+    translatorIdRef.current = nanoid(6);
+    editorRef.current?.setValue(appConfig.DEFAULT_EDITOR_VALUE);
+    forceUpdate();
+  };
 
   const handleClickBasicTranslatorMenu = () => {
-    setCode(basicTranslator);
+    editorRef.current?.setValue(basicTranslator);
   };
 
   const handleClickResetMenu = () => {
-    setCode(defaultEditorValue);
+    editorRef.current?.setValue(appConfig.DEFAULT_EDITOR_VALUE);
   };
+
+  const handleClickSaveButton = () => {
+    modals.openConfirmModal({
+      title: <Text fw={600}>{t('ui.saveConfirmationModal.title')}</Text>,
+      children: (
+        <Stack gap="xs">
+          <Text size="sm">
+            {t.rich('ui.saveConfirmationModal.message', {
+              translatorFileName: `${translatorIdRef.current}.js`,
+              blue: (chunks) => (
+                <Text component="span" c="blue" fw={600}>
+                  {chunks}
+                </Text>
+              ),
+            })}
+          </Text>
+          {translators.length >= appConfig.MAX_TRANSLATORS && (
+            <Text size="sm" c="red">
+              {t('ui.saveConfirmationModal.note', { maxTranslators: appConfig.MAX_TRANSLATORS })}
+            </Text>
+          )}
+        </Stack>
+      ),
+      labels: { confirm: t('ui.confirm'), cancel: t('ui.cancel') },
+      onConfirm: async () => {
+        const now = Date.now();
+        const translator: Translator = {
+          id: translatorIdRef.current,
+          createdAt: now,
+          updatedAt: now,
+          name: translatorIdRef.current,
+          content: editorRef.current?.getValue() ?? '',
+        };
+        await persistTranslator(translator);
+        temporaryRef.current = false;
+        forceUpdate();
+      },
+    });
+  };
+
+  const handleMonacoEditorWillMount: BeforeMount = (monaco) => {
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSyntaxValidation: true,
+    });
+  };
+
+  const handleMonacoEditorDidMount: OnMount = (editor) => {
+    editorRef.current = editor;
+  };
+
+  const handleMonacoEditorChange: OnChange = async (value) => {
+    if (!temporaryRef.current) {
+      await updateTranslatorContent(translatorIdRef.current, value ?? '');
+    }
+  };
+
+  const dates = new Set();
 
   return (
     <Card withBorder radius="md" p={0}>
       <Flex direction="column" h="100%">
         <Group justify="space-between" p="md">
           <Group gap="xs">
-            <Tooltip label={t('ui.history')} openDelay={500}>
-              <ActionIcon variant="default">
-                <IconHistory style={{ width: '70%', height: '70%' }} stroke={1.5} />
-              </ActionIcon>
-            </Tooltip>
-            <Text fw="600" c="blue">
-              Translator ({translatorId})
+            <Menu shadow="md" width={225} position="bottom-start">
+              <MenuTarget>
+                <Tooltip label={t('ui.history')} openDelay={500}>
+                  <ActionIcon variant="default" onMouseEnter={handleMouseEnterHistoryButton}>
+                    <IconHistory style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                  </ActionIcon>
+                </Tooltip>
+              </MenuTarget>
+              <MenuDropdown>
+                {translators.length > 0 ? (
+                  translators
+                    .sort((a, b) => b.updatedAt - a.updatedAt)
+                    .map((translator) => {
+                      const date = dayjs(translator.updatedAt).format('DD-MM-YYYY');
+                      const showDate = !dates.has(date);
+                      dates.add(date);
+
+                      return (
+                        <Fragment key={translator.id}>
+                          {showDate && <MenuLabel ff="monospace">{date}</MenuLabel>}
+                          <MenuItem
+                            color={translator.id === translatorIdRef.current ? 'green' : undefined}
+                            rightSection={
+                              <Text size="xs" c="dimmed" ff="monospace">
+                                {dayjs(translator.updatedAt).format('HH:mm:ss')}
+                              </Text>
+                            }
+                            onClick={() => handleClickHistoryMenuItem(translator.id)}
+                          >
+                            {translator.name}.js
+                          </MenuItem>
+                        </Fragment>
+                      );
+                    })
+                ) : (
+                  <MenuLabel>{t('ui.noData')}</MenuLabel>
+                )}
+              </MenuDropdown>
+            </Menu>
+            <Text fw="600" c={temporaryRef.current ? 'blue' : 'green'}>
+              {translatorIdRef.current}
               <Text component="span" c="dimmed">
                 .js
               </Text>
             </Text>
+            {!temporaryRef.current && (
+              <ActionIcon
+                variant="subtle"
+                size="xs"
+                color="red"
+                onClick={handleClickCloseTranslatorButton}
+              >
+                <IconX
+                  style={{ width: '70%', height: '70%' }}
+                  color="var(--mantine-color-red-5)"
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            )}
           </Group>
 
           <Group gap="xs">
@@ -114,8 +261,13 @@ export function Editor({ translatorId }: EditorProps) {
               </Tooltip>
             </TooltipGroup>
             <Divider orientation="vertical" />
-            <Button size="compact-sm" color="green">
-              {t('ui.save')}
+            <Button
+              size="compact-sm"
+              color="green"
+              onClick={handleClickSaveButton}
+              disabled={!temporaryRef.current}
+            >
+              {t(temporaryRef.current ? 'ui.save' : 'ui.saved')}
             </Button>
           </Group>
         </Group>
@@ -124,7 +276,7 @@ export function Editor({ translatorId }: EditorProps) {
 
         <MonacoEditor
           defaultLanguage="javascript"
-          value={code}
+          defaultValue={appConfig.DEFAULT_EDITOR_VALUE}
           theme={theme}
           options={{
             fontFamily: "'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
@@ -132,12 +284,10 @@ export function Editor({ translatorId }: EditorProps) {
             minimap: { enabled: false },
             wordWrap: 'on',
           }}
-          onMount={(_editor, monaco) => {
-            monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-              noSyntaxValidation: true,
-            });
-          }}
           loading={<Loader color="blue" />}
+          beforeMount={handleMonacoEditorWillMount}
+          onMount={handleMonacoEditorDidMount}
+          onChange={handleMonacoEditorChange}
         />
       </Flex>
     </Card>

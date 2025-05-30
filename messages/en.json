@@ -10,9 +10,18 @@
     "generateTranslatorId": "Generate translatorID",
     "beautify": "Beautify",
     "save": "Save",
+    "saved": "Saved",
     "typeUrl": "Type URL...",
     "run": "Run",
     "test": "Test",
-    "basic": "Basic"
+    "basic": "Basic",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "saveConfirmationModal": {
+      "title": "Save confirmation",
+      "message": "Are you sure you want to save the translator <blue>{translatorFileName}</blue>?",
+      "note": "The maximum number of translators allowed is {maxTranslators}. If you confirm saving this translator, the oldest one will be deleted."
+    },
+    "noData": "No data"
   }
 }
