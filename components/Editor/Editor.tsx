@@ -28,10 +28,14 @@ import {
   MenuItem,
   MenuLabel,
   MenuTarget,
+  Popover,
+  PopoverDropdown,
+  PopoverTarget,
   Stack,
   Text,
   Tooltip,
   TooltipGroup,
+  UnstyledButton,
   useComputedColorScheme,
 } from '@mantine/core';
 import { useForceUpdate } from '@mantine/hooks';
@@ -57,6 +61,7 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const temporaryRef = useRef(true);
   const translatorIdRef = useRef(generatedTranslatorId);
+  const translatorRef = useRef<Translator>(null);
   const [translators, setTranslators] = useState<Translator[]>([]);
   const [triggerLoadAllTranslators, setTriggerLoadAllTranslators] = useState(0);
   const forceUpdate = useForceUpdate();
@@ -79,6 +84,7 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
     if (translator) {
       temporaryRef.current = false;
       translatorIdRef.current = translator.id;
+      translatorRef.current = translator;
       editorRef.current?.setValue(translator.content);
       forceUpdate();
     }
@@ -87,6 +93,7 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
   const handleClickCloseTranslatorButton = () => {
     temporaryRef.current = true;
     translatorIdRef.current = nanoid(6);
+    translatorRef.current = null;
     editorRef.current?.setValue(appConfig.DEFAULT_EDITOR_VALUE);
     forceUpdate();
   };
@@ -133,6 +140,7 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
         };
         await persistTranslator(translator);
         temporaryRef.current = false;
+        translatorRef.current = translator;
         forceUpdate();
       },
     });
@@ -200,12 +208,61 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
                 )}
               </MenuDropdown>
             </Menu>
-            <Text fw="600" c={temporaryRef.current ? 'blue' : 'green'}>
-              {translatorIdRef.current}
-              <Text component="span" c="dimmed">
-                .js
-              </Text>
-            </Text>
+            <Popover
+              width={250}
+              position="bottom-start"
+              withArrow
+              shadow="md"
+              disabled={temporaryRef.current}
+            >
+              <PopoverTarget>
+                <UnstyledButton>
+                  <Text fw="600" c={temporaryRef.current ? 'blue' : 'green'}>
+                    {translatorIdRef.current}
+                    <Text component="span" c="dimmed">
+                      .js
+                    </Text>
+                  </Text>
+                </UnstyledButton>
+              </PopoverTarget>
+              <PopoverDropdown>
+                <Stack gap="xs">
+                  <Flex direction="column">
+                    <Text fz="sm" c="dimmed">
+                      ID
+                    </Text>
+                    <Text fz="sm">{translatorRef.current?.id}</Text>
+                  </Flex>
+                  <Flex direction="column">
+                    <Text fz="sm" c="dimmed">
+                      {t('ui.createdAt')}
+                    </Text>
+                    <Text fz="sm">
+                      {dayjs(translatorRef.current?.createdAt).format('HH:mm:ss DD-MM-YYYY')}
+                    </Text>
+                  </Flex>
+                  <Flex direction="column">
+                    <Text fz="sm" c="dimmed">
+                      {t('ui.updatedAt')}
+                    </Text>
+                    <Text fz="sm">
+                      {dayjs(translatorRef.current?.updatedAt).format('HH:mm:ss DD-MM-YYYY')}
+                    </Text>
+                  </Flex>
+                  <Flex direction="column">
+                    <Text fz="sm" c="dimmed">
+                      {t('ui.name')}
+                    </Text>
+                    <Text fz="sm" c="green">
+                      {translatorRef.current?.name}
+                      <Text component="span" fz="sm" c="dimmed">
+                        .js
+                      </Text>
+                    </Text>
+                  </Flex>
+                </Stack>
+              </PopoverDropdown>
+            </Popover>
             {!temporaryRef.current && (
               <ActionIcon
                 variant="subtle"

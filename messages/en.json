@@ -22,6 +22,9 @@
       "message": "Are you sure you want to save the translator <blue>{translatorFileName}</blue>?",
       "note": "The maximum number of translators allowed is {maxTranslators}. If you confirm saving this translator, the oldest one will be deleted."
     },
-    "noData": "No data"
+    "noData": "No data",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "name": "Name"
   }
 }

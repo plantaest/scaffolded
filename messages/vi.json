@@ -22,6 +22,9 @@
       "message": "Bạn có chắc chắn muốn lưu translator <blue>{translatorFileName}</blue>?",
       "note": "Số translator tối đa được phép lưu là {maxTranslators}. Nếu bạn xác nhận lưu translator này, thì một translator cũ nhất sẽ bị xóa."
     },
-    "noData": "Không có dữ liệu"
+    "noData": "Không có dữ liệu",
+    "createdAt": "Tạo lúc",
+    "updatedAt": "Cập nhật lúc",
+    "name": "Tên"
   }
 }
