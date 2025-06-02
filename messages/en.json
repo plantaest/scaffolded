@@ -25,6 +25,9 @@
     "noData": "No data",
     "createdAt": "Created at",
     "updatedAt": "Updated at",
-    "name": "Name"
+    "name": "Name",
+    "notification": {
+      "translatorId": "A translatorID has been created and copied to the clipboard"
+    }
   }
 }

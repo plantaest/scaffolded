@@ -49,6 +49,7 @@ import {
   persistTranslator,
   updateTranslatorContent,
 } from '@/utils/db';
+import { notice } from '@/utils/notice';
 
 interface EditorProps {
   generatedTranslatorId: string;
@@ -104,6 +105,11 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
 
   const handleClickResetMenu = () => {
     editorRef.current?.setValue(appConfig.DEFAULT_EDITOR_VALUE);
+  };
+
+  const handleClickGenerateTranslatorIdButton = async () => {
+    await navigator.clipboard.writeText(crypto.randomUUID());
+    notice.success(t('ui.notification.translatorId'));
   };
 
   const handleClickSaveButton = () => {
@@ -307,7 +313,7 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
                 </MenuDropdown>
               </Menu>
               <Tooltip label={t('ui.generateTranslatorId')}>
-                <ActionIcon variant="default">
+                <ActionIcon variant="default" onClick={handleClickGenerateTranslatorIdButton}>
                   <Icon123 style={{ width: '70%', height: '70%' }} stroke={1.5} />
                 </ActionIcon>
               </Tooltip>

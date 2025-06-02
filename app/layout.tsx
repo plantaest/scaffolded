@@ -4,9 +4,11 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale } from 'next-intl/server';
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
+import { Notifications } from '@mantine/notifications';
 import { theme } from '@/theme';
 
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
 
 export const metadata = {
   title: 'Scaffolded',
@@ -34,6 +36,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body>
         <NextIntlClientProvider>
           <MantineProvider theme={theme}>
+            <Notifications />
             <ModalsProvider>{children}</ModalsProvider>
           </MantineProvider>
         </NextIntlClientProvider>

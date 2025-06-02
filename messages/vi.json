@@ -25,6 +25,9 @@
     "noData": "Không có dữ liệu",
     "createdAt": "Tạo lúc",
     "updatedAt": "Cập nhật lúc",
-    "name": "Tên"
+    "name": "Tên",
+    "notification": {
+      "translatorId": "Đã tạo translatorID và sao chép vào bộ nhớ đệm"
+    }
   }
 }
