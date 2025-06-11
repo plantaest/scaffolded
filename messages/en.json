@@ -30,6 +30,7 @@
       "translatorId": "A translatorID has been created and copied to the clipboard"
     },
     "copy": "Copy",
-    "copied": "Copied"
+    "copied": "Copied",
+    "focusUrlInput": "Focus URL input"
   }
 }

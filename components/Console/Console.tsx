@@ -1,7 +1,7 @@
 'use client';
 
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { valibotResolver } from 'mantine-form-valibot-resolver';
 import { useTranslations } from 'next-intl';
@@ -24,6 +24,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useHotkeys } from '@mantine/hooks';
 import { TestCase } from '@/types/TestCase';
 import { TestCaseResult } from '@/types/TestCaseResult';
 import { currentTranslatorIdRef } from '@/utils/currentTranslatorIdRef';
@@ -65,13 +66,15 @@ export function Console() {
   const [testApiLoading, setTestApiLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const urlInputRef = useRef<HTMLInputElement>(null);
+
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: formInitialValues,
     validate: valibotResolver(formSchema),
   });
 
-  const handleFormSubmit = form.onSubmit(async (formValues) => {
+  const handleRunApiFormSubmit = form.onSubmit(async (formValues) => {
     const translator = await getTranslatorById(currentTranslatorIdRef.current!);
     const translatorCode = translator ? translator.content : temporaryTranslatorCodeRef.current;
     const testUrl = formValues.url;
@@ -146,15 +149,22 @@ export function Console() {
     }
   };
 
+  useHotkeys([
+    ['mod + I', () => urlInputRef.current?.focus()],
+    ['mod + J', () => handleRunApiFormSubmit()],
+    ['mod + K', () => handleClickTestButton()],
+  ]);
+
   return (
     <CodeHighlightAdapterProvider adapter={shikiAdapter}>
       <Card withBorder radius="md" p={0}>
         <Flex direction="column" style={{ overflow: 'hidden' }}>
           <Group justify="space-between" p="md">
             <Group gap="xs" wrap="nowrap" w="100%" align="start">
-              <form onSubmit={handleFormSubmit} style={{ flex: 1 }}>
+              <form onSubmit={handleRunApiFormSubmit} style={{ flex: 1 }}>
                 <Group gap="xs" wrap="nowrap" align="start">
                   <TextInput
+                    ref={urlInputRef}
                     variant="filled"
                     size="xs"
                     placeholder={t('ui.typeUrl')}

@@ -38,7 +38,7 @@ import {
   UnstyledButton,
   useComputedColorScheme,
 } from '@mantine/core';
-import { useForceUpdate } from '@mantine/hooks';
+import { useForceUpdate, useHotkeys } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { basicTranslator } from '@/app/basic-translator';
 import { Translator } from '@/types/Translator';
@@ -61,10 +61,13 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
   const t = useTranslations();
   const computedColorScheme = useComputedColorScheme('light');
   const theme = computedColorScheme === 'light' ? 'light' : 'vs-dark';
+
   const editorRef = useRef<Parameters<OnMount>[0]>(null);
   const temporaryRef = useRef(true);
   const translatorIdRef = useRef(generatedTranslatorId);
   const translatorRef = useRef<Translator>(null);
+  const translatorNameRef = useRef<HTMLButtonElement>(null);
+
   const [translators, setTranslators] = useState<Translator[]>([]);
   const [triggerLoadAllTranslators, setTriggerLoadAllTranslators] = useState(0);
   const forceUpdate = useForceUpdate();
@@ -164,8 +167,12 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
     });
   };
 
-  const handleMonacoEditorDidMount: OnMount = (editor) => {
+  const handleMonacoEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
+
+    editor.addCommand(monaco.KeyCode.Escape, () => {
+      translatorNameRef.current?.focus();
+    });
   };
 
   const handleMonacoEditorChange: OnChange = async (value) => {
@@ -177,6 +184,8 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
   };
 
   const dates = new Set();
+
+  useHotkeys([['mod + U', () => handleClickSaveButton()]]);
 
   return (
     <Card withBorder radius="md" p={0}>
@@ -230,7 +239,7 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
               disabled={temporaryRef.current}
             >
               <PopoverTarget>
-                <UnstyledButton>
+                <UnstyledButton ref={translatorNameRef}>
                   <Text fw="600" c={temporaryRef.current ? 'blue' : 'green'}>
                     {translatorIdRef.current}
                     <Text component="span" c="dimmed">

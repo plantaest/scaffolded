@@ -30,6 +30,7 @@
       "translatorId": "Đã tạo translatorID và sao chép vào bộ nhớ đệm"
     },
     "copy": "Sao chép",
-    "copied": "Đã sao chép"
+    "copied": "Đã sao chép",
+    "focusUrlInput": "Đến ô nhập URL"
   }
 }
