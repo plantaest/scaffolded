@@ -43,6 +43,7 @@ import { modals } from '@mantine/modals';
 import { basicTranslator } from '@/app/basic-translator';
 import { Translator } from '@/types/Translator';
 import { appConfig } from '@/utils/appConfig';
+import { currentTranslatorIdRef } from '@/utils/currentTranslatorIdRef';
 import {
   getTranslatorById,
   loadAllTranslators,
@@ -50,6 +51,7 @@ import {
   updateTranslatorContent,
 } from '@/utils/db';
 import { notice } from '@/utils/notice';
+import { temporaryTranslatorCodeRef } from '@/utils/temporaryTranslatorCodeRef';
 
 interface EditorProps {
   generatedTranslatorId: string;
@@ -66,6 +68,10 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
   const [translators, setTranslators] = useState<Translator[]>([]);
   const [triggerLoadAllTranslators, setTriggerLoadAllTranslators] = useState(0);
   const forceUpdate = useForceUpdate();
+
+  useEffect(() => {
+    currentTranslatorIdRef.current = translatorIdRef.current;
+  }, [translatorIdRef.current]);
 
   useEffect(() => {
     loadAllTranslators().then(setTranslators);
@@ -165,6 +171,8 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
   const handleMonacoEditorChange: OnChange = async (value) => {
     if (!temporaryRef.current) {
       await updateTranslatorContent(translatorIdRef.current, value ?? '');
+    } else {
+      temporaryTranslatorCodeRef.current = value ?? '';
     }
   };
 
@@ -345,7 +353,6 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
             fontFamily: "'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
             fontSize: 14,
             minimap: { enabled: false },
-            wordWrap: 'on',
           }}
           loading={<Loader color="blue" />}
           beforeMount={handleMonacoEditorWillMount}

@@ -9,6 +9,7 @@ import { theme } from '@/theme';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+import '@mantine/code-highlight/styles.css';
 
 export const metadata = {
   title: 'Scaffolded',

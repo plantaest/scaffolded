@@ -20,7 +20,9 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
+    "@mantine/code-highlight": "^8.0.2",
     "@mantine/core": "8.0.2",
+    "@mantine/form": "^8.0.2",
     "@mantine/hooks": "8.0.2",
     "@mantine/modals": "^8.0.2",
     "@mantine/notifications": "^8.0.2",
@@ -29,11 +31,14 @@
     "@tabler/icons-react": "^3.33.0",
     "dayjs": "^1.11.13",
     "idb": "^8.0.3",
+    "mantine-form-valibot-resolver": "^3.0.1",
     "nanoid": "^5.1.5",
     "next": "15.3.2",
     "next-intl": "^4.1.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "shiki": "^3.6.0",
+    "valibot": "^1.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.27.3",

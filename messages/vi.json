@@ -28,6 +28,8 @@
     "name": "Tên",
     "notification": {
       "translatorId": "Đã tạo translatorID và sao chép vào bộ nhớ đệm"
-    }
+    },
+    "copy": "Sao chép",
+    "copied": "Đã sao chép"
   }
 }

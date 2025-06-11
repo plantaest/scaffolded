@@ -28,6 +28,8 @@
     "name": "Name",
     "notification": {
       "translatorId": "A translatorID has been created and copied to the clipboard"
-    }
+    },
+    "copy": "Copy",
+    "copied": "Copied"
   }
 }
