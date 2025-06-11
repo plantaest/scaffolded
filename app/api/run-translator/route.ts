@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { unlink, writeFile } from 'fs/promises';
 
-export async function POST(req: Request) {
-  const { translatorCode, testUrl } = await req.json();
+export async function POST(request: Request) {
+  const { translatorCode, testUrl } = await request.json();
 
   if (!translatorCode || !testUrl) {
     return NextResponse.json({ error: 'Missing translatorCode or testUrl' }, { status: 400 });

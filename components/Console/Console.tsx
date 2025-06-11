@@ -1,5 +1,6 @@
 'use client';
 
+import dayjs from 'dayjs';
 import { useState } from 'react';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { valibotResolver } from 'mantine-form-valibot-resolver';
@@ -10,8 +11,21 @@ import {
   CodeHighlightAdapterProvider,
   createShikiAdapter,
 } from '@mantine/code-highlight';
-import { Alert, Button, Card, Divider, Flex, Group, TextInput } from '@mantine/core';
+import {
+  Alert,
+  Anchor,
+  Button,
+  Card,
+  Divider,
+  Flex,
+  Group,
+  Stack,
+  Text,
+  TextInput,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { TestCase } from '@/types/TestCase';
+import { TestCaseResult } from '@/types/TestCaseResult';
 import { currentTranslatorIdRef } from '@/utils/currentTranslatorIdRef';
 import { getTranslatorById } from '@/utils/db';
 import { errorMessage } from '@/utils/errorMessage';
@@ -37,15 +51,18 @@ const formInitialValues: FormValues = {
   url: '',
 };
 
-interface Result {
+interface RunApiResult {
   date: string;
   response: string;
 }
 
 export function Console() {
   const t = useTranslations();
-  const [result, setResult] = useState<Result | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<'run' | 'test'>('run');
+  const [runApiResult, setRunApiResult] = useState<RunApiResult | null>(null);
+  const [testCaseResults, setTestCaseResults] = useState<TestCaseResult[]>([]);
+  const [runApiLoading, setRunApiLoading] = useState(false);
+  const [testApiLoading, setTestApiLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm({
@@ -59,7 +76,8 @@ export function Console() {
     const translatorCode = translator ? translator.content : temporaryTranslatorCodeRef.current;
     const testUrl = formValues.url;
 
-    setLoading(true);
+    setMode('run');
+    setRunApiLoading(true);
 
     try {
       const response = await fetch('/api/run-translator', {
@@ -71,19 +89,62 @@ export function Console() {
       const data = await response.json();
 
       if (!response.ok) {
-        setResult(null);
+        setRunApiResult(null);
         setError(data.error || 'Unknown error');
       } else {
-        setResult({ date: new Date().toISOString(), response: data.result });
+        setRunApiResult({ date: new Date().toISOString(), response: data.result });
         setError(null);
       }
     } catch (err: any) {
-      setResult(null);
+      setRunApiResult(null);
       setError(err.message || 'Something went wrong');
     } finally {
-      setLoading(false);
+      setRunApiLoading(false);
     }
   });
+
+  const handleClickTestButton = async () => {
+    const translator = await getTranslatorById(currentTranslatorIdRef.current!);
+    const translatorCode = translator ? translator.content : temporaryTranslatorCodeRef.current;
+
+    setMode('test');
+    setTestApiLoading(true);
+
+    try {
+      // Ref: https://github.com/zotero/translation-server/blob/master/test/import_test.js#L88
+      const marker = translatorCode.indexOf('/** BEGIN TEST CASES **/');
+      if (marker === -1) {
+        setError('Cannot find the string "/** BEGIN TEST CASES **/"');
+      }
+
+      const start = translatorCode.indexOf('[', marker);
+      const end = translatorCode.lastIndexOf(']') + 1;
+      const testCases: TestCase[] = JSON.parse(
+        translatorCode.substring(Math.max(start, marker), Math.max(end, start, marker))
+      );
+
+      const response = await fetch('/api/test-translator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ translatorCode, testCases }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setTestCaseResults([]);
+        setError(data.error || 'Unknown error');
+      } else {
+        setTestCaseResults(data.cases);
+        setError(null);
+      }
+    } catch (err: any) {
+      setTestCaseResults([]);
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setTestApiLoading(false);
+    }
+  };
 
   return (
     <CodeHighlightAdapterProvider adapter={shikiAdapter}>
@@ -103,13 +164,15 @@ export function Console() {
                     key={form.key('url')}
                     {...form.getInputProps('url')}
                   />
-                  <Button type="submit" size="compact-sm" loading={loading}>
+                  <Button type="submit" size="compact-sm" loading={runApiLoading}>
                     {t('ui.run')}
                   </Button>
                 </Group>
               </form>
               <Divider orientation="vertical" />
-              <Button size="compact-sm">{t('ui.test')}</Button>
+              <Button size="compact-sm" onClick={handleClickTestButton} loading={testApiLoading}>
+                {t('ui.test')}
+              </Button>
             </Group>
           </Group>
 
@@ -124,16 +187,16 @@ export function Console() {
               title="ERROR"
               icon={<IconInfoCircle />}
             >
-              ({new Date().toISOString()}) {error}
+              ({dayjs().format('HH:mm:ss DD-MM-YYYY')}) {error}
             </Alert>
           )}
 
-          {result && (
+          {mode === 'run' && runApiResult && (
             <CodeHighlight
               code={JSON.stringify(
-                Array.isArray(result.response) && result.response.length === 1
-                  ? result.response[0]
-                  : result.response,
+                Array.isArray(runApiResult.response) && runApiResult.response.length === 1
+                  ? runApiResult.response[0]
+                  : runApiResult.response,
                 null,
                 4
               )}
@@ -146,6 +209,32 @@ export function Console() {
                 code: { fontSize: 'var(--mantine-font-size-sm)' },
               }}
             />
+          )}
+
+          {mode === 'test' && testCaseResults.length > 0 && (
+            <Stack p="md">
+              {testCaseResults.map((result, index) => (
+                <Alert
+                  key={index}
+                  variant="light"
+                  color={result.status === 'success' ? 'green' : 'red'}
+                  radius="md"
+                  title={`TEST CASE ${index + 1} – ${result.status === 'success' ? 'SUCCESS' : 'ERROR'}`}
+                  icon={<IconInfoCircle />}
+                >
+                  <Stack gap="xs">
+                    <Anchor size="sm" w="fit-content" href={result.url} target="_blank">
+                      {result.url}
+                    </Anchor>
+                    {result.error && (
+                      <Text size="sm" c="red">
+                        {result.error}
+                      </Text>
+                    )}
+                  </Stack>
+                </Alert>
+              ))}
+            </Stack>
           )}
         </Flex>
       </Card>
