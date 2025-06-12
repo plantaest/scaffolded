@@ -8,7 +8,6 @@
     "templates": "Templates",
     "reset": "Reset",
     "generateTranslatorId": "Generate translatorID",
-    "beautify": "Beautify",
     "save": "Save",
     "saved": "Saved",
     "typeUrl": "Type URL...",
@@ -31,6 +30,7 @@
     },
     "copy": "Copy",
     "copied": "Copied",
-    "focusUrlInput": "Focus URL input"
+    "focusUrlInput": "Focus URL input",
+    "emptyUrl": "Empty URL"
   }
 }

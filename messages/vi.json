@@ -8,7 +8,6 @@
     "templates": "Mẫu",
     "reset": "Đặt lại",
     "generateTranslatorId": "Sinh translatorID",
-    "beautify": "Làm đẹp mã",
     "save": "Lưu",
     "saved": "Đã lưu",
     "typeUrl": "Nhập URL...",
@@ -31,6 +30,7 @@
     },
     "copy": "Sao chép",
     "copied": "Đã sao chép",
-    "focusUrlInput": "Đến ô nhập URL"
+    "focusUrlInput": "Đến ô nhập URL",
+    "emptyUrl": "URL trống"
   }
 }

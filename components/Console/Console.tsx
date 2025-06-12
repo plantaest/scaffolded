@@ -233,9 +233,15 @@ export function Console() {
                   icon={<IconInfoCircle />}
                 >
                   <Stack gap="xs">
-                    <Anchor size="sm" w="fit-content" href={result.url} target="_blank">
-                      {result.url}
-                    </Anchor>
+                    {result.url.trim().length > 0 ? (
+                      <Anchor size="sm" w="fit-content" href={result.url} target="_blank">
+                        {result.url}
+                      </Anchor>
+                    ) : (
+                      <Text size="sm" fs="italic" c="dimmed">
+                        {t('ui.emptyUrl')}
+                      </Text>
+                    )}
                     {result.error && (
                       <Text size="sm" c="red">
                         {result.error}

@@ -9,7 +9,6 @@ import {
   IconCode,
   IconHistory,
   IconRestore,
-  IconWand,
   IconX,
 } from '@tabler/icons-react';
 import { nanoid } from 'nanoid';
@@ -332,11 +331,6 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
               <Tooltip label={t('ui.generateTranslatorId')}>
                 <ActionIcon variant="default" onClick={handleClickGenerateTranslatorIdButton}>
                   <Icon123 style={{ width: '70%', height: '70%' }} stroke={1.5} />
-                </ActionIcon>
-              </Tooltip>
-              <Tooltip label={t('ui.beautify')}>
-                <ActionIcon variant="default">
-                  <IconWand style={{ width: '70%', height: '70%' }} stroke={1.5} />
                 </ActionIcon>
               </Tooltip>
             </TooltipGroup>
