@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 8000",
-    "build": "next build",
+    "dev": "next dev",
+    "build": "next build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/ && (cd .next/standalone && zip -r ../../standalone.zip .)",
     "analyze": "ANALYZE=true next build",
-    "start": "next start -p 8000",
+    "start": "PORT=8000 node ./server.js",
     "typecheck": "tsc --noEmit",
     "lint": "npm run eslint && npm run stylelint",
     "eslint": "next lint",
@@ -38,6 +38,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "shiki": "^3.6.0",
+    "styled-jsx": "^5.1.7",
     "valibot": "^1.1.0"
   },
   "devDependencies": {
