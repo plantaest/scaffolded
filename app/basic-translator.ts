@@ -1,7 +1,12 @@
-export const basicTranslator = `{
-    "translatorID": "",
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+
+export const basicTranslator = () => `{
+    "translatorID": "${crypto.randomUUID()}",
     "label": "",
-    "creator": "Plantaest",
+    "creator": "",
     "target": "",
     "minVersion": "3.0",
     "maxVersion": "",
@@ -9,7 +14,7 @@ export const basicTranslator = `{
     "inRepository": true,
     "translatorType": 4,
     "browserSupport": "gcsibv",
-    "lastUpdated": "2025-08-01 00:00:00"
+    "lastUpdated": "${dayjs.utc().format('YYYY-MM-DD HH:mm:ss')}"
 }
 
 function detectWeb(doc, url) {
@@ -32,7 +37,7 @@ function doWeb(doc, url) {
     translator.setHandler('itemDone', (obj, item) => {
         item.itemType = detectWeb(doc, url);
 
-        // Additional config for item object
+        // Additional configs for item object
 
         item.complete();
     });

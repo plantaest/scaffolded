@@ -108,7 +108,7 @@ export function Editor({ generatedTranslatorId }: EditorProps) {
   };
 
   const handleClickBasicTranslatorMenu = () => {
-    editorRef.current?.setValue(basicTranslator);
+    editorRef.current?.setValue(basicTranslator());
   };
 
   const handleClickResetMenu = () => {
