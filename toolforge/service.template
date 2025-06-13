@@ -1,0 +1,5 @@
+backend: kubernetes
+cpu: 1000m
+mem: 2Gi
+replicas: 1
+type: node18

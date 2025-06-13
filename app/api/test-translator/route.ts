@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { unlink, writeFile } from 'fs/promises';
 import { TestCase } from '@/types/TestCase';
 import { TestCaseResult } from '@/types/TestCaseResult';
+import { zoteroTranslationServerUri } from '@/utils/zoteroTranslationServerUri';
 
 interface RequestBody {
   translatorCode: string;
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
 
     for (const testCase of testCases) {
       try {
-        const response = await fetch('http://localhost:1969/web', {
+        const response = await fetch(zoteroTranslationServerUri('web'), {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
           body: testCase.url,

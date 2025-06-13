@@ -1,0 +1,11 @@
+:8000 {
+	encode gzip
+
+	handle_path /_zts/* {
+		reverse_proxy localhost:1969
+	}
+
+	handle {
+		reverse_proxy localhost:3000
+	}
+}

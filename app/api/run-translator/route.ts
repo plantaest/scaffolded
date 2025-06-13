@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { unlink, writeFile } from 'fs/promises';
+import { zoteroTranslationServerUri } from '@/utils/zoteroTranslationServerUri';
 
 export async function POST(request: Request) {
   const { translatorCode, testUrl } = await request.json();
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
     await writeFile(filePath, translatorCode, 'utf-8');
 
     // Send request to Zotero Translation Server
-    const response = await fetch('http://localhost:1969/web', {
+    const response = await fetch(zoteroTranslationServerUri('web'), {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
       body: testUrl,

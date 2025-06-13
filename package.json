@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/ && (cd .next/standalone && zip -r ../../standalone.zip .)",
+    "build": "./build.sh",
     "analyze": "ANALYZE=true next build",
-    "start": "PORT=8000 node ./server.js",
+    "start": "HOSTNAME=0.0.0.0 PORT=3000 node ./server.js",
     "typecheck": "tsc --noEmit",
     "lint": "npm run eslint && npm run stylelint",
     "eslint": "next lint",
